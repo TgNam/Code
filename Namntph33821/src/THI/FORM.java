@@ -13,29 +13,29 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author TgNam
  */
-public class FROM extends javax.swing.JFrame {
+public class FORM extends javax.swing.JFrame {
     
     private QLSanPham ql = new QLCN();
     private DefaultTableModel tableModel;
-
-    public FROM() {
+    
+    public FORM() {
         initComponents();
     }
-
+    
     public void combobox() {
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         comboBoxModel.addElement("Laptop");
         comboBoxModel.addElement("SmartPhone");
         cbodanhmuc.setModel(comboBoxModel);
     }
-
+    
     public void column() {
         tableModel = new DefaultTableModel();
         String[] column = {"Tên SP", "MÃ SP", "Danh Mục", "Tình Trạng", "Đơn Giá"};
         tableModel.setColumnIdentifiers(column);
         tblsanpham.setModel(tableModel);
     }
-
+    
     public void datarow(ArrayList<SanPham> list) {
         tableModel = (DefaultTableModel) tblsanpham.getModel();
         tableModel.setRowCount(0);
@@ -68,6 +68,7 @@ public class FROM extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         bthexit = new javax.swing.JButton();
+        bthtimkiem = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblsanpham = new javax.swing.JTable();
 
@@ -136,6 +137,13 @@ public class FROM extends javax.swing.JFrame {
             }
         });
 
+        bthtimkiem.setText("Tìm kiếm");
+        bthtimkiem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bthtimkiemActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -173,21 +181,26 @@ public class FROM extends javax.swing.JFrame {
                                 .addComponent(rdohethang, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(txtdongia, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(169, 169, 169)
-                        .addComponent(jButton5)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton6)
-                        .addGap(18, 18, 18)
-                        .addComponent(bthexit))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(123, 123, 123)
-                        .addComponent(bththem)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(bthsua)
-                        .addGap(18, 18, 18)
-                        .addComponent(bthxoa)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(bthreset)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(bthtimkiem)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jButton5)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton6)
+                                .addGap(18, 18, 18)
+                                .addComponent(bthexit))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(123, 123, 123)
+                                .addComponent(bththem)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(bthsua)
+                                .addGap(18, 18, 18)
+                                .addComponent(bthxoa)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(bthreset)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(29, 29, 29))
         );
         jPanel1Layout.setVerticalGroup(
@@ -226,7 +239,8 @@ public class FROM extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton5)
                     .addComponent(jButton6)
-                    .addComponent(bthexit))
+                    .addComponent(bthexit)
+                    .addComponent(bthtimkiem))
                 .addContainerGap())
         );
 
@@ -301,22 +315,66 @@ public class FROM extends javax.swing.JFrame {
 
     private void bththemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bththemActionPerformed
         StringBuilder sb = new StringBuilder();
-        if (txtten.getText().equals("")) {
+        if (txtten.getText().trim().equals("")) {
             sb.append("Username is empty");
         }
+        
         if (sb.length() > 0) {
             JOptionPane.showMessageDialog(this, sb.toString(), "Error", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            SanPham sanPham = new SanPham();
-            sanPham.setTen(txtten.getText());
-            sanPham.setMasv(txtid.getText());
-            sanPham.setDanhMuc(cbodanhmuc.getSelectedItem().toString());
-            sanPham.setTrangthai(rdoconhang.isSelected() ? 0 : 1);
-            sanPham.setDongia(Double.parseDouble(txtdongia.getText()));
-            JOptionPane.showMessageDialog(this, ql.add(sanPham), "Save", JOptionPane.PLAIN_MESSAGE);
-            datarow(ql.getList());
-            bthresetActionPerformed(evt);
+            if (txtten.getText().length() <= 20) {
+                if (txtid.getText().length() <= 20) {
+                    
+                    try {
+                        
+                        if (Double.parseDouble(txtdongia.getText().replace(" ", "")) >= 0) {
+                            if (txtdongia.getText().replace(" ", "").length() <= 9) {
+                                boolean check = true;
+                                for (SanPham sanPham : ql.getList()) {
+                                    if (txtten.getText().replace(" ", "").equals(sanPham.getTen().replace(" ", ""))) {
+                                        check = false;
+                                        JOptionPane.showMessageDialog(this, "Đối tượng đã tồn tại", "Save", JOptionPane.INFORMATION_MESSAGE);
+                                        return;
+                                    }
+                                }
+                                
+                                if (check) {
+                                    
+                                    SanPham sanPham = new SanPham();
+                                    sanPham.setTen(txtten.getText());
+                                    sanPham.setMasv(txtid.getText());
+                                    sanPham.setDanhMuc(cbodanhmuc.getSelectedItem().toString());
+                                    sanPham.setTrangthai(rdoconhang.isSelected() ? 0 : 1);
+                                    sanPham.setDongia(Double.parseDouble(txtdongia.getText().replace(" ", "")));
+                                    
+                                    JOptionPane.showMessageDialog(this, ql.add(sanPham), "Save", JOptionPane.PLAIN_MESSAGE);
+                                    datarow(ql.getList());
+                                    bthresetActionPerformed(evt);
+                                    
+                                }
+                            } else {
+                                txtdongia.setText("");
+                                JOptionPane.showMessageDialog(this, "Bạn cần nhập số lượng kí tự <=9", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Bạn cần nhập số dương", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
+                        
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(this, "Bạn cần nhập số!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        txtdongia.setText("");
+                    }
+                    
+                } else {
+                    txtid.setText("");
+                    JOptionPane.showMessageDialog(this, "Độ dài quá 20 kí tự", "ID", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } else {
+                txtten.setText("");
+                JOptionPane.showMessageDialog(this, "Độ dài quá 20 kí tự", "User", JOptionPane.INFORMATION_MESSAGE);
+            }
         }
+
     }//GEN-LAST:event_bththemActionPerformed
 
     private void bthsuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bthsuaActionPerformed
@@ -324,23 +382,63 @@ public class FROM extends javax.swing.JFrame {
         if (txtten.getText().equals("")) {
             sb.append("Username is empty");
         }
+        
         if (sb.length() > 0) {
             JOptionPane.showMessageDialog(this, sb.toString(), "Error", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            for (SanPham sanPham : ql.getList()) {
-                if (sanPham.getTen().trim().equals(txtten.getText())) {
-                    int index = tblsanpham.getSelectedRow();
-                    sanPham.setTen(txtten.getText());
-                    sanPham.setMasv(txtid.getText());
-                    sanPham.setDanhMuc(cbodanhmuc.getSelectedItem().toString());
-                    sanPham.setTrangthai(rdoconhang.isSelected() ? 0 : 1);
-                    sanPham.setDongia(Double.parseDouble(txtdongia.getText()));
-                    JOptionPane.showMessageDialog(this, ql.update(index, sanPham), "Updete", JOptionPane.PLAIN_MESSAGE);
-                    datarow(ql.getList());
-                    bthresetActionPerformed(evt);
-                    return;                    
-                }                
-            }            
+            if (txtten.getText().length() <= 20) {
+                if (txtid.getText().length() <= 20) {
+                    
+                    try {
+                        
+                        String dongia = txtdongia.getText().replace(" ", "");
+                        
+                        if (Double.parseDouble(dongia) >= 0) {
+                            if (dongia.replace(" ", "").length() <= 9) {
+                                boolean check = true;
+                                for (SanPham sanPham : ql.getList()) {
+                                    if (txtten.getText().replace(" ", "").equals(sanPham.getTen().replace(" ", ""))) {
+                                        check = false;
+                                        int index = tblsanpham.getSelectedRow();
+                                        sanPham.setTen(txtten.getText());
+                                        sanPham.setMasv(txtid.getText());
+                                        sanPham.setDanhMuc(cbodanhmuc.getSelectedItem().toString());
+                                        sanPham.setTrangthai(rdoconhang.isSelected() ? 0 : 1);
+                                        sanPham.setDongia(Double.parseDouble(dongia));
+                                        JOptionPane.showMessageDialog(this, ql.update(index, sanPham), "Update", JOptionPane.PLAIN_MESSAGE);
+                                        datarow(ql.getList());
+                                        bthresetActionPerformed(evt);
+                                        
+                                        return;
+                                    }
+                                }
+                                
+                                if (check) {
+                                    bththemActionPerformed(evt);
+                                    datarow(ql.getList());
+                                    bthresetActionPerformed(evt);
+                                }
+                            } else {
+                                txtdongia.setText("");
+                                JOptionPane.showMessageDialog(this, "Bạn cần nhập số lượng kí tự <=9", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Bạn cần nhập số dương", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
+                        
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(this, "Bạn cần nhập số!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        txtdongia.setText("");
+                    }
+                
+                } else {
+                    txtid.setText("");
+                    JOptionPane.showMessageDialog(this, "Độ dài quá 20 kí tự", "ID", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } else {
+                txtten.setText("");
+                JOptionPane.showMessageDialog(this, "Độ dài quá 20 kí tự", "User", JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }//GEN-LAST:event_bthsuaActionPerformed
 
@@ -358,7 +456,7 @@ public class FROM extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(this, ql.remove(index), "Xoa", JOptionPane.PLAIN_MESSAGE);
                     datarow(ql.getList());
                     bthresetActionPerformed(evt);
-                    return;                    
+                    return;
                 }
             }
         }
@@ -373,8 +471,43 @@ public class FROM extends javax.swing.JFrame {
     }//GEN-LAST:event_bthresetActionPerformed
 
     private void bthexitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bthexitActionPerformed
-       System.exit(0);
+        System.exit(0);
     }//GEN-LAST:event_bthexitActionPerformed
+
+    private void bthtimkiemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bthtimkiemActionPerformed
+        StringBuilder sb = new StringBuilder();
+        if (txtten.getText().equals("")) {
+            sb.append("Username is empty");
+        }
+        
+        if (sb.length() > 0) {
+            JOptionPane.showMessageDialog(this, sb.toString(), "Error", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            if (txtten.getText().length() <= 20) {
+                boolean check = true;
+                for (SanPham sanPham : ql.getList()) {
+                    if (sanPham.getTen().trim().equalsIgnoreCase(txtten.getText().trim())) {
+                        txtid.setText(sanPham.getMasv());
+                        cbodanhmuc.setSelectedItem(sanPham.getDanhMuc());
+                        if (sanPham.getTrangthai() == 0) {
+                            rdoconhang.setSelected(true);
+                        } else {
+                            rdohethang.setSelected(true);
+                        }
+                        txtdongia.setText(String.valueOf((double) sanPham.getDongia()));
+                        check = false;
+                        break;
+                    }
+                }
+                if (check) {
+                    JOptionPane.showMessageDialog(this, "Đối tượng không tồn tại", "!", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } else {
+                txtten.setText("");
+                JOptionPane.showMessageDialog(this, "Độ dài quá 20 kí tự", "User", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_bthtimkiemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -393,20 +526,21 @@ public class FROM extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FROM.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FORM.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FROM.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FORM.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FROM.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FORM.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FROM.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FORM.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FROM().setVisible(true);
+                new FORM().setVisible(true);
             }
         });
     }
@@ -416,6 +550,7 @@ public class FROM extends javax.swing.JFrame {
     private javax.swing.JButton bthreset;
     private javax.swing.JButton bthsua;
     private javax.swing.JButton bththem;
+    private javax.swing.JButton bthtimkiem;
     private javax.swing.JButton bthxoa;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox<String> cbodanhmuc;
